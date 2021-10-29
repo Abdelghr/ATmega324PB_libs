@@ -35,7 +35,7 @@ int USART_asynch_init(uint8_t port, volatile uint16_t ubrr, uint8_t speed)
             UBRR0L = (uint8_t)ubrr;
             if (speed)
                 UCSR0A |= (1 << U2X);
-            UCSR0B = (1 << TXEN) | (1 << RXEN) | (1 << RXCIE) | (1 << TXCIE);
+            UCSR0B = (1 << TXEN) | (1 << RXEN);
             UCSR0C = (1 << UCSZ0) | (1 << UCSZ1) | (1 << USBS) | (1 << UPM1);
             return 0;
         case 1:
@@ -43,7 +43,7 @@ int USART_asynch_init(uint8_t port, volatile uint16_t ubrr, uint8_t speed)
             UBRR1L = (uint8_t)ubrr;
             if (speed)
                 UCSR1A |= (1 << U2X);
-            UCSR1B = (1 << TXEN) | (1 << RXEN) | (1 << RXCIE) | (1 << TXCIE);
+            UCSR1B = (1 << TXEN) | (1 << RXEN);
             UCSR1C = (1 << UCSZ0) | (1 << UCSZ1) | (1 << USBS) | (1 << UPM1);
             return 0;
         case 2:
@@ -51,7 +51,7 @@ int USART_asynch_init(uint8_t port, volatile uint16_t ubrr, uint8_t speed)
             UBRR2L = (uint8_t)ubrr;
             if (speed)
                 UCSR2A |= (1 << U2X);
-            UCSR2B = (1 << TXEN) | (1 << RXEN) | (1 << RXCIE) | (1 << TXCIE);
+            UCSR2B = (1 << TXEN) | (1 << RXEN);
             UCSR2C = (1 << UCSZ0) | (1 << UCSZ1) | (1 << USBS) | (1 << UPM1);
             return 0;
         default:
@@ -77,7 +77,7 @@ int USART_synch_init(uint8_t port, volatile uint16_t ubrr, uint8_t role)
                 DDRB &= ~(1 << DDB0);
             UBRR0H = (uint8_t)(ubrr >> 8);
             UBRR0L = (uint8_t)ubrr;
-            UCSR0B = (1 << TXEN) | (1 << RXEN) | (1 << RXCIE) | (1 << TXCIE);
+            UCSR0B = (1 << TXEN) | (1 << RXEN);
             UCSR0C = (1 << UCSZ0) | (1 << UCSZ1) | (1 << USBS) | (1 << UPM1) | (1 << UMSEL0);
             return 0;
         case 1:
@@ -87,7 +87,7 @@ int USART_synch_init(uint8_t port, volatile uint16_t ubrr, uint8_t role)
                 DDRD &= ~(1 << DDD4);
             UBRR1H = (uint8_t)(ubrr >> 8);
             UBRR1L = (uint8_t)ubrr;
-            UCSR1B = (1 << TXEN) | (1 << RXEN) | (1 << RXCIE) | (1 << TXCIE);
+            UCSR1B = (1 << TXEN) | (1 << RXEN);
             UCSR1C = (1 << UCSZ0) | (1 << UCSZ1) | (1 << USBS) | (1 << UPM1) | (1 << UMSEL0);
             return 0;
         case 2:
@@ -97,7 +97,7 @@ int USART_synch_init(uint8_t port, volatile uint16_t ubrr, uint8_t role)
                 DDRD &= ~(1 << DDD7);
             UBRR2H = (uint8_t)(ubrr >> 8);
             UBRR2L = (uint8_t)ubrr;
-            UCSR2B = (1 << TXEN) | (1 << RXEN) | (1 << RXCIE) | (1 << TXCIE);
+            UCSR2B = (1 << TXEN) | (1 << RXEN);
             UCSR2C = (1 << UCSZ0) | (1 << UCSZ1) | (1 << USBS) | (1 << UPM1) | (1 << UMSEL0);
             return 0;
         default:
