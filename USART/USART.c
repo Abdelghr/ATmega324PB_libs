@@ -198,7 +198,7 @@ int USART_putdouble(uint8_t port, double value, uint8_t arr_size, uint8_t width,
 
 /* Gets character received by USART
  * PORT: USART port number
- * RETURN: Received data on success and -1 on "port" failure
+ * RETURN: Received data on success and -1 on "port" failure, parity error, or frame error
  */
 char USART_getchar(const uint8_t port)
 {
@@ -209,43 +209,49 @@ char USART_getchar(const uint8_t port)
         case 0:
             while (!(UCSR0A & (1 << RXC))) // Wait until data received in buffer
                 ;
-            if ((UCSR0A & (1 << UPE)) == (1 << UPE)) // Parity error check
+            if (UCSR0A & (1 << UPE)) // Parity error check
             {
                 parity_error++;
                 UCSR0A &= ~(1 << UPE);
+                return -1;
             }
             if ((UCSR0A & (1 << FE)) == (1 << FE)) // Frame error check
             {
                 frame_error++;
                 UCSR0A &= ~(1 << FE);
+                return -1;
             }
             return UDR0;
         case 1:
             while (!(UCSR1A & (1 << RXC)))
                 ;
-            if ((UCSR1A & (1 << UPE)) == (1 << UPE))
+            if (UCSR1A & (1 << UPE))
             {
                 parity_error++;
                 UCSR1A &= ~(1 << UPE);
+                return -1;
             }
-            if ((UCSR1A & (1 << FE)) == (1 << FE))
+            if (UCSR1A & (1 << FE))
             {
                 frame_error++;
                 UCSR1A &= ~(1 << FE);
+                return -1;
             }
             return UDR1;
         case 2:
             while (!(UCSR2A & (1 << RXC)))
                 ;
-            if ((UCSR2A & (1 << UPE)) == (1 << UPE))
+            if (UCSR2A & (1 << UPE))
             {
                 parity_error++;
                 UCSR2A &= ~(1 << UPE);
+                return -1;
             }
-            if ((UCSR2A & (1 << FE)) == (1 << FE))
+            if (UCSR2A & (1 << FE))
             {
                 frame_error++;
                 UCSR2A &= ~(1 << FE);
+                return -1;
             }
             return UDR2;
         default:
