@@ -31,7 +31,7 @@ uint8_t pwm_servo(uint8_t n, uint8_t init_pos)
     if ((init_pos > 180) || (init_pos < 0))
         return 1;
     // Calculate output register value for wanted servo position
-    uint16_t dc = init_pos * 11.11 + 2000;
+    uint16_t dc = init_pos * 11.11 + 1999;
     switch (n)
     {
         case 1:
@@ -88,7 +88,7 @@ uint8_t servo_pos(uint8_t n, uint8_t pos)
 {
     if ((pos > 180) || (pos < 0))
         return 1;
-    uint16_t dc = pos * 11.11 + 2000;
+    uint16_t dc = pos * 11.11 + 1999;
     switch (n)
     {
         case 1:
