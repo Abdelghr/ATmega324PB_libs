@@ -1,0 +1,1 @@
+This library was created for controlling a unipolar stepper motor using a ULN2003A driver. The "step_align" function allows the stepper motor to align with one of the phases at start-up, which guarantees that the next step will rotate the shaft by the desired angle.
