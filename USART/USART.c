@@ -15,52 +15,45 @@
 #include <stdlib.h>
 
 // Parity error bit, incremented with each parity error detection
-uint8_t parity_error = 0;
+uint8_t parity_error;
 // Frame error bit, incremented with each frame error detection
-uint8_t frame_error = 0;
+uint8_t frame_error;
 
-/* Initialize USART "port", baud rate set by "ubrr", 2 stop bits, Even parity
- * normal speed mode, Asynchronous
+/* Initialize USART in asynchronous normal speed mode, 1 stop bit, Even parity,
+ * no interrupts
  * PORT: USART port number
  * UBRR: UBRR register value to generate baud rate
- * SPEED: DOUBLE_SPEED or NORMAL_SPEED symbolic constant
  * RETURN: 0 on success and 1 on "port" failure
  */
-int USART_asynch_init(uint8_t port, volatile uint16_t ubrr, uint8_t speed)
+int USART_asynch_init(uint8_t port, volatile uint16_t ubrr)
 {
     switch (port)
     {
         case 0:
             UBRR0H = (uint8_t)(ubrr >> 8);
             UBRR0L = (uint8_t)ubrr;
-            if (speed)
-                UCSR0A |= (1 << U2X);
             UCSR0B = (1 << TXEN) | (1 << RXEN);
-            UCSR0C = (1 << UCSZ0) | (1 << UCSZ1) | (1 << USBS) | (1 << UPM1);
+            UCSR0C = (1 << UCSZ0) | (1 << UCSZ1) | (1 << UPM1);
             return 0;
         case 1:
             UBRR1H = (uint8_t)(ubrr >> 8);
             UBRR1L = (uint8_t)ubrr;
-            if (speed)
-                UCSR1A |= (1 << U2X);
             UCSR1B = (1 << TXEN) | (1 << RXEN);
-            UCSR1C = (1 << UCSZ0) | (1 << UCSZ1) | (1 << USBS) | (1 << UPM1);
+            UCSR1C = (1 << UCSZ0) | (1 << UCSZ1) | (1 << UPM1);
             return 0;
         case 2:
             UBRR2H = (uint8_t)(ubrr >> 8);
             UBRR2L = (uint8_t)ubrr;
-            if (speed)
-                UCSR2A |= (1 << U2X);
             UCSR2B = (1 << TXEN) | (1 << RXEN);
-            UCSR2C = (1 << UCSZ0) | (1 << UCSZ1) | (1 << USBS) | (1 << UPM1);
+            UCSR2C = (1 << UCSZ0) | (1 << UCSZ1) | (1 << UPM1);
             return 0;
         default:
             return 1;
     }
 }
 
-/* Initialize USART "port", baud rate set by "ubrr", 2 stop bits, Even parity
- * normal speed mode, Synchronous
+/* Initialize USART in asynchronous normal speed mode, 1 stop bit, Even parity
+ * no interrupts
  * PORT: USART port number
  * UBRR: UBRR register value to generate baud rate
  * ROLE: MASTER or SLAVE symbolic constant
@@ -71,34 +64,34 @@ int USART_synch_init(uint8_t port, volatile uint16_t ubrr, uint8_t role)
     switch (port)
     {
         case 0:
-            if (role)
+            if (role) // Master or slave
                 DDRB |= (1 << DDB0);
             else
                 DDRB &= ~(1 << DDB0);
             UBRR0H = (uint8_t)(ubrr >> 8);
             UBRR0L = (uint8_t)ubrr;
             UCSR0B = (1 << TXEN) | (1 << RXEN);
-            UCSR0C = (1 << UCSZ0) | (1 << UCSZ1) | (1 << USBS) | (1 << UPM1) | (1 << UMSEL0);
+            UCSR0C = (1 << UCSZ0) | (1 << UCSZ1) | (1 << UPM1) | (1 << UMSEL0);
             return 0;
         case 1:
-            if (role)
+            if (role) // Master or slave
                 DDRD |= (1 << DDD4);
             else
                 DDRD &= ~(1 << DDD4);
             UBRR1H = (uint8_t)(ubrr >> 8);
             UBRR1L = (uint8_t)ubrr;
             UCSR1B = (1 << TXEN) | (1 << RXEN);
-            UCSR1C = (1 << UCSZ0) | (1 << UCSZ1) | (1 << USBS) | (1 << UPM1) | (1 << UMSEL0);
+            UCSR1C = (1 << UCSZ0) | (1 << UCSZ1) | (1 << UPM1) | (1 << UMSEL0);
             return 0;
         case 2:
-            if (role)
+            if (role) // Master or slave
                 DDRD |= (1 << DDD7);
             else
                 DDRD &= ~(1 << DDD7);
             UBRR2H = (uint8_t)(ubrr >> 8);
             UBRR2L = (uint8_t)ubrr;
             UCSR2B = (1 << TXEN) | (1 << RXEN);
-            UCSR2C = (1 << UCSZ0) | (1 << UCSZ1) | (1 << USBS) | (1 << UPM1) | (1 << UMSEL0);
+            UCSR2C = (1 << UCSZ0) | (1 << UCSZ1) | (1 << UPM1) | (1 << UMSEL0);
             return 0;
         default:
             return 1;
@@ -198,7 +191,7 @@ int USART_putdouble(uint8_t port, double value, uint8_t arr_size, uint8_t width,
 
 /* Gets character received by USART
  * PORT: USART port number
- * RETURN: Received data on success and -1 on "port" failure, parity error, or frame error
+ * RETURN: Received data on success and -1 on "port" failure
  */
 char USART_getchar(const uint8_t port)
 {
@@ -213,13 +206,11 @@ char USART_getchar(const uint8_t port)
             {
                 parity_error++;
                 UCSR0A &= ~(1 << UPE);
-                return -1;
             }
-            if ((UCSR0A & (1 << FE)) == (1 << FE)) // Frame error check
+            if (UCSR0A & (1 << FE)) // Frame error check
             {
                 frame_error++;
                 UCSR0A &= ~(1 << FE);
-                return -1;
             }
             return UDR0;
         case 1:
@@ -229,13 +220,11 @@ char USART_getchar(const uint8_t port)
             {
                 parity_error++;
                 UCSR1A &= ~(1 << UPE);
-                return -1;
             }
             if (UCSR1A & (1 << FE))
             {
                 frame_error++;
                 UCSR1A &= ~(1 << FE);
-                return -1;
             }
             return UDR1;
         case 2:
@@ -245,13 +234,11 @@ char USART_getchar(const uint8_t port)
             {
                 parity_error++;
                 UCSR2A &= ~(1 << UPE);
-                return -1;
             }
             if (UCSR2A & (1 << FE))
             {
                 frame_error++;
                 UCSR2A &= ~(1 << FE);
-                return -1;
             }
             return UDR2;
         default:
