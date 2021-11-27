@@ -1,0 +1,1 @@
+This piece of software was used to measure the frequency of data availability on a digital pressure sensor. Which allowed us to know the rate at which to fetch the data without using an external interrupt pin and an interrupt service routine.
